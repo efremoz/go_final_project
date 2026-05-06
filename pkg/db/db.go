@@ -3,10 +3,11 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"go_final_project/pkg/constants"
 	"os"
 
 	_ "modernc.org/sqlite"
+
+	"go_final_project/pkg/constants"
 )
 
 var db *sql.DB
@@ -14,15 +15,17 @@ var db *sql.DB
 func Init(dbFile string) error {
 	_, err := os.Stat(dbFile)
 
-	db, err = sql.Open("sqlite", dbFile)
+	db, err = sql.Open("sqlite", dbFile+"?cache=shared")
 	if err != nil {
 		return fmt.Errorf("error opening database: " + err.Error())
 	}
 
 	if _, err := db.Exec(constants.Schema); err != nil {
+		_ = db.Close()
 		return fmt.Errorf("schema creating error: " + err.Error())
 	}
 
+	db.SetMaxOpenConns(1)
 	return nil
 }
 

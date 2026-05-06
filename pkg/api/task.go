@@ -2,8 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"go_final_project/pkg/db"
 	"net/http"
+
+	"go_final_project/pkg/db"
 )
 
 func TaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -14,6 +15,8 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 		UpdateTaskHandler(w, r)
 	case http.MethodGet:
 		GetTaskHandler(w, r)
+	case http.MethodDelete:
+		DeleteTaskHandler(w, r)
 	default:
 		errorResponse(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -60,6 +63,22 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	err := db.UpdateTask(&task)
 	if err != nil {
 		errorResponse(w, "error updating the task in the database: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(w, struct{}{})
+}
+
+func DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		errorResponse(w, "ID not specified", http.StatusBadRequest)
+		return
+	}
+
+	err := db.DeleteTask(id)
+	if err != nil {
+		errorResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 

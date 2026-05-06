@@ -1,9 +1,12 @@
 package api
 
 import (
-	"go_final_project/pkg/db"
 	"net/http"
+
+	"go_final_project/pkg/db"
 )
+
+const limit = 50
 
 type TasksResp struct {
 	Tasks []*db.Task `json:"tasks"`
@@ -16,7 +19,6 @@ func TasksHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	search := r.URL.Query().Get("search")
-	const limit = 50
 
 	tasks, err := db.Tasks(search, limit)
 

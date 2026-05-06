@@ -9,9 +9,10 @@ import (
 	"go_final_project/pkg/db"
 )
 
+const port = 7540
+const webDir = "./web"
+
 func main() {
-	const port = 7540
-	const webDir = "./web"
 
 	dbFile := "scheduler.db"
 
@@ -26,7 +27,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
-	log.Printf("The server is running on http://localhost:%d", port)
+	log.Printf("the server is running on http://localhost:%d", port)
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {

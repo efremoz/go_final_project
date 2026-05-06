@@ -3,8 +3,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"go_final_project/pkg/constants"
 	"time"
+
+	"go_final_project/pkg/constants"
 )
 
 type Task struct {
@@ -13,6 +14,47 @@ type Task struct {
 	Title   string `json:"title"`
 	Comment string `json:"comment"`
 	Repeat  string `json:"repeat"`
+}
+
+func UpdateDate(id string, newDate string) error {
+	query := `UPDATE scheduler SET date = ? WHERE id = ?`
+
+	result, err := db.Exec(query, newDate, id)
+	if err != nil {
+		return fmt.Errorf("issue date update error: %w", err)
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("error getting the number of updated rows: %w", err)
+	}
+
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for updating task`)
+	}
+
+	return nil
+}
+
+func DeleteTask(id string) error {
+	query := `DELETE FROM scheduler WHERE id = ?`
+
+	result, err := db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("issue deletion error: %w", err)
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("error getting the number of updated rows: %w", err)
+	}
+
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for updating task`)
+	}
+
+	return nil
+
 }
 
 func AddTask(task *Task) (int64, error) {
@@ -70,7 +112,8 @@ func Tasks(search string, limit int) ([]*Task, error) {
 	var rows *sql.Rows
 	var err error
 
-	if isDateQuery(search) {
+	switch {
+	case isDateQuery(search):
 		date := convertDateFormat(search)
 		query := `
 		SELECT id, date, title, comment, repeat
@@ -79,7 +122,7 @@ func Tasks(search string, limit int) ([]*Task, error) {
 		ORDER BY date
 		LIMIT ?`
 		rows, err = db.Query(query, date, limit)
-	} else if search != "" {
+	case search != "":
 		pattern := "%" + search + "%"
 		query := `
 		SELECT id, date, title, comment, repeat
@@ -88,7 +131,7 @@ func Tasks(search string, limit int) ([]*Task, error) {
 		ORDER BY date
 		LIMIT ?`
 		rows, err = db.Query(query, pattern, pattern, limit)
-	} else {
+	default:
 		query := `
 		SELECT id, date, title, comment, repeat
 		FROM scheduler

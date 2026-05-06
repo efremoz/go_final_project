@@ -3,10 +3,11 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"go_final_project/pkg/constants"
-	"go_final_project/pkg/db"
 	"net/http"
 	"time"
+
+	"go_final_project/pkg/constants"
+	"go_final_project/pkg/db"
 )
 
 func AddTaskHandler(w http.ResponseWriter, r *http.Request) {

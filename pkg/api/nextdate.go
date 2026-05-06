@@ -2,11 +2,13 @@ package api
 
 import (
 	"fmt"
-	"go_final_project/pkg/constants"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"go_final_project/pkg/constants"
 )
 
 func afterNow(date, now time.Time) bool {
@@ -17,6 +19,10 @@ func afterNow(date, now time.Time) bool {
 
 func newDay(now time.Time, start time.Time, parts []string) (string, error) {
 	maxInterval := 400
+
+	if len(parts) != 2 {
+		return "", fmt.Errorf("incorrect format of the repetition rule: %s", strings.Join(parts, " "))
+	}
 
 	interval, err := strconv.Atoi(parts[1])
 	if err != nil {
@@ -39,6 +45,11 @@ func newDay(now time.Time, start time.Time, parts []string) (string, error) {
 
 func newYear(now time.Time, start time.Time, parts []string) (string, error) {
 	date := start
+
+	if len(parts) != 1 {
+		return "", fmt.Errorf("incorrect format of the repetition rule: %s", strings.Join(parts, " "))
+	}
+
 	for {
 		date = date.AddDate(1, 0, 0)
 		if afterNow(date, now) {
@@ -110,5 +121,7 @@ func NextDateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(next))
+	if _, err := w.Write([]byte(next)); err != nil {
+		log.Printf("response write error: %v", err)
+	}
 }
