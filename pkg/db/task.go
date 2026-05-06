@@ -22,12 +22,48 @@ func AddTask(task *Task) (int64, error) {
 		INSERT INTO scheduler (date, title, comment, repeat)
 		VALUES (?, ?, ?, ?)`
 
-	result, err := db.Exec(query, task.Date, task.Title, task.Comment, task.Repeat)
+	res, err := db.Exec(query, task.Date, task.Title, task.Comment, task.Repeat)
 	if err == nil {
-		id, err = result.LastInsertId()
+		id, err = res.LastInsertId()
 	}
 
 	return id, err
+}
+
+func GetTask(id string) (*Task, error) {
+	var task Task
+	query := `
+		SELECT id, date, title, comment, repeat
+		FROM scheduler
+		WHERE id = ?`
+
+	err := db.QueryRow(query, id).Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
+	if err != nil {
+		return nil, err
+	}
+	return &task, nil
+}
+
+func UpdateTask(task *Task) error {
+	query := `
+		UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ?
+		WHERE id = ?`
+
+	res, err := db.Exec(query, task.Date, task.Title, task.Comment, task.Repeat, task.ID)
+	if err != nil {
+		return fmt.Errorf("issue update error: %w", err)
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return fmt.Errorf(`incorrect id for updating task`)
+	}
+
+	return nil
 }
 
 func Tasks(search string, limit int) ([]*Task, error) {
