@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go_final_project/pkg/api"
 	"log"
 	"net/http"
 
@@ -16,16 +17,19 @@ func main() {
 
 	err := db.Init(dbFile)
 	if err != nil {
-		db.Close()
-		log.Fatal("Ошибка инициализации БД: ", err)
+		log.Fatal("db initialization error: ", err)
 	}
+
+	defer db.Close()
+
+	api.Init()
 
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
-	log.Printf("Сервер запущен на http://localhost:%d", port)
+	log.Printf("The server is running on http://localhost:%d", port)
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {
-		log.Fatal("Ошибка запуска сервера:", err)
+		log.Fatal("server startup error:", err)
 	}
 }
