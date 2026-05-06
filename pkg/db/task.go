@@ -1,6 +1,11 @@
 package db
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+	"go_final_project/pkg/constants"
+	"time"
+)
 
 type Task struct {
 	ID      string `json:"id"`
@@ -25,14 +30,37 @@ func AddTask(task *Task) (int64, error) {
 	return id, err
 }
 
-func Tasks(limit int) ([]*Task, error) {
-	query := `
+func Tasks(search string, limit int) ([]*Task, error) {
+	var rows *sql.Rows
+	var err error
+
+	if isDateQuery(search) {
+		date := convertDateFormat(search)
+		query := `
+		SELECT id, date, title, comment, repeat
+		FROM scheduler
+		WHERE date = ?
+		ORDER BY date
+		LIMIT ?`
+		rows, err = db.Query(query, date, limit)
+	} else if search != "" {
+		pattern := "%" + search + "%"
+		query := `
+		SELECT id, date, title, comment, repeat
+		FROM scheduler
+		WHERE title LIKE ? OR comment LIKE ?
+		ORDER BY date
+		LIMIT ?`
+		rows, err = db.Query(query, pattern, pattern, limit)
+	} else {
+		query := `
 		SELECT id, date, title, comment, repeat
 		FROM scheduler
 		ORDER BY date
 		LIMIT ?`
+		rows, err = db.Query(query, limit)
+	}
 
-	rows, err := db.Query(query, limit)
 	if err != nil {
 		return nil, fmt.Errorf("error getting the task list: %w", err)
 	}
@@ -54,4 +82,14 @@ func Tasks(limit int) ([]*Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func isDateQuery(s string) bool {
+	_, err := time.Parse(constants.InputDateFormat, s)
+	return err == nil
+}
+
+func convertDateFormat(dateStr string) string {
+	t, _ := time.Parse(constants.InputDateFormat, dateStr)
+	return t.Format(constants.DateFormat)
 }

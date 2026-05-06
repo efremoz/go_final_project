@@ -15,7 +15,11 @@ func TasksHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tasks, err := db.Tasks(50)
+	search := r.URL.Query().Get("search")
+	const limit = 50
+
+	tasks, err := db.Tasks(search, limit)
+
 	if err != nil {
 		errorResponse(w, "error receiving tasks "+err.Error(), http.StatusInternalServerError)
 		return

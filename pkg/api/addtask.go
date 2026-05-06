@@ -51,7 +51,7 @@ func checkDate(task *db.Task) error {
 		return err
 	}
 
-	if !t.After(now) {
+	if !afterNow(t, now) {
 		return nil
 	}
 	if task.Repeat == "" {

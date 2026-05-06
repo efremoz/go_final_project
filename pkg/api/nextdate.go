@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+func afterNow(date, now time.Time) bool {
+	dateStr := date.Format(constants.DateFormat)
+	nowStr := now.Format(constants.DateFormat)
+	return dateStr > nowStr
+}
+
 func newDay(now time.Time, start time.Time, parts []string) (string, error) {
 	maxInterval := 400
 
@@ -24,7 +30,7 @@ func newDay(now time.Time, start time.Time, parts []string) (string, error) {
 	date := start
 	for {
 		date = date.AddDate(0, 0, interval)
-		if date.After(now) {
+		if afterNow(date, now) {
 			break
 		}
 	}
@@ -35,7 +41,7 @@ func newYear(now time.Time, start time.Time, parts []string) (string, error) {
 	date := start
 	for {
 		date = date.AddDate(1, 0, 0)
-		if date.After(now) {
+		if afterNow(date, now) {
 			break
 		}
 	}

@@ -15,9 +15,10 @@ const (
 )
 
 const (
-	DateFormat = "20060102"
-	Day        = "d"
-	Month      = "m"
-	Year       = "y"
-	Weekday    = "w"
+	DateFormat      = "20060102"
+	Day             = "d"
+	Month           = "m"
+	Year            = "y"
+	Weekday         = "w"
+	InputDateFormat = "01.01.2026"
 )
