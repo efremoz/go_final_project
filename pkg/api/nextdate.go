@@ -87,7 +87,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 }
 
 func NextDateHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+	if r.Method != http.MethodGet {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
