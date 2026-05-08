@@ -30,7 +30,7 @@ func newDay(now time.Time, start time.Time, parts []string) (string, error) {
 	}
 
 	if interval > maxInterval {
-		return "", fmt.Errorf("the maximum allowed interval has been exceeded (%d):", maxInterval, interval)
+		return "", fmt.Errorf("the maximum allowed interval has been exceeded (maxInterval: %d, interval: %d)", maxInterval, interval)
 	}
 
 	date := start
