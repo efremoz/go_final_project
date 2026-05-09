@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	_ "modernc.org/sqlite"
 
@@ -13,6 +14,13 @@ import (
 var db *sql.DB
 
 func Init(dbFile string) error {
+	dir := filepath.Dir(dbFile)
+	if dir != "." && dir != "" {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return fmt.Errorf("directory creation error %s: %w", dir, err)
+		}
+	}
+
 	_, err := os.Stat(dbFile)
 
 	db, err = sql.Open("sqlite", dbFile+"?cache=shared")
