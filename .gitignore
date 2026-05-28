@@ -1,2 +1,5 @@
 .idea
-scheduler.db
+*.db
+*.exe
+*.env
+.dockerignore
