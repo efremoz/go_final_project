@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-APP_DIR="$ROOT/dist/Планировщик задач.app"
+APP_DIR="$ROOT/dist/yandex-task-to-do-go-final.app"
 BINARY="$APP_DIR/Contents/Resources/scheduler"
 
 echo "Создание .app..."
@@ -40,6 +40,8 @@ cat >"$APP_DIR/Contents/Info.plist" <<'EOF'
 	<string>11.0</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>LSMultipleInstancesProhibited</key>
+	<false/>
 </dict>
 </plist>
 EOF
